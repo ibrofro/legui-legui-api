@@ -30,7 +30,7 @@ class User extends CheckInformationClass {
       });
       return user;
     } else {
-      throw new Error("Error while fetching the user");
+      throw new TypeError("Error while fetching the user");
     }
   }
 }

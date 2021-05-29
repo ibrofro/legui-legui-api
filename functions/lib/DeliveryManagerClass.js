@@ -15,7 +15,8 @@ class DeliveryManagerClass extends CheckInformationClass {
     const senderNameVerified = super.checkName(params.senderName);
     const receiverNameVerified = super.checkName(params.receiverName);
     const senderNotificationTokenVerified = super.checkIfExist(params.senderNotificationToken);
-    const senderCoordinatesVerified = super.checkCoordinates(params.senderLongitude, params.senderLatitude); // Put verified information on the
+    const senderCoordinatesVerified = super.checkCoordinates(params.senderLongitude, params.senderLatitude);
+    const senderRegionVerified = super.checkIfRegionIsValid(params.region); // Put verified information on the
     // delivery collection.
 
     const result = await this.collection.add({
@@ -29,8 +30,8 @@ class DeliveryManagerClass extends CheckInformationClass {
       senderLocation: new firebaseAdminSdk.firestore.GeoPoint(parseInt(senderCoordinatesVerified.lat), parseInt(senderCoordinatesVerified.lon)),
       senderCity: params.city ? String(params.city) : "",
       senderAddress: params.displayName ? String(params.displayName) : "",
-      senderRegion: params.region ? String(params.region) : "",
-      status: "",
+      senderRegion: super.checkIfRegionIsValid(params.region),
+      status: "waiting-for-receiver-confirmation",
       createdAt: new Date(),
       price: ""
     });

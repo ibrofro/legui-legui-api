@@ -27,7 +27,7 @@ route.post("/", async (req, res) => {
     const created = await deliveryManager.createDelivery(deliveryParam);
     res.send(created);
   } catch (error) {
-    console.log(`An error occured during delivery creation ${error}`);
+    console.log(`${error.stack}`);
     res.status(500);
     res.send("An error occured");
   }

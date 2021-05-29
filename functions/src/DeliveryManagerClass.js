@@ -34,7 +34,7 @@ class DeliveryManagerClass extends CheckInformationClass {
       params.senderLongitude,
       params.senderLatitude
     );
-
+    const senderRegionVerified = super.checkIfRegionIsValid(params.region);
     // Put verified information on the
     // delivery collection.
     const result = await this.collection.add({
@@ -51,8 +51,8 @@ class DeliveryManagerClass extends CheckInformationClass {
       ),
       senderCity: params.city ? String(params.city) : "",
       senderAddress: params.displayName ? String(params.displayName) : "",
-      senderRegion: params.region ? String(params.region) : "",
-      status: "",
+      senderRegion: super.checkIfRegionIsValid(params.region),
+      status: "waiting-for-receiver-confirmation",
       createdAt: new Date(),
       price: "",
     });

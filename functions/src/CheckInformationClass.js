@@ -39,5 +39,15 @@ class CheckInformationClass {
       
     }
   }
+
+  checkIfRegionIsValid(region: string): string {
+    const regex = /^(Dakar){1}$/i;
+    if (regex.test(region)) {
+      return region;
+    } else {
+        throw new Error(`Only Dakar is supported as region.`);
+      
+    }
+  }
 }
 module.exports = CheckInformationClass;
