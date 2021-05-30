@@ -6,10 +6,8 @@ class DeliveryManagerClass extends CheckInformationClass {
   senderPhone: string;
   receiverPhone: string;
   collection: any;
-  constructor(senderPhone: string, receiverPhone: string) {
+  constructor() {
     super();
-    this.senderPhone = this.checkSnPhone(senderPhone);
-    this.receiverPhone = this.checkSnPhone(receiverPhone);
     this.collection = firebaseAdminSdk.firestore().collection("delivery");
   }
 
@@ -20,6 +18,8 @@ class DeliveryManagerClass extends CheckInformationClass {
     senderNotificationToken: string,
     senderLongitude: string,
     senderLatitude: string,
+    senderPhone: string,
+    receiverPhone: string,
     city: string,
     region: string,
     displayName: string,
@@ -27,6 +27,8 @@ class DeliveryManagerClass extends CheckInformationClass {
     const senderUidVerified = super.checkIfExist(params.senderUid);
     const senderNameVerified = super.checkName(params.senderName);
     const receiverNameVerified = super.checkName(params.receiverName);
+    const senderPhoneVerified = super.checkSnPhone(params.senderPhone);
+    const receiverPhoneVerified = super.checkSnPhone(params.receiverPhone);
     const senderNotificationTokenVerified = super.checkIfExist(
       params.senderNotificationToken
     );
@@ -38,12 +40,12 @@ class DeliveryManagerClass extends CheckInformationClass {
     // Put verified information on the
     // delivery collection.
     const result = await this.collection.add({
-      phoneArray: [this.senderPhone, this.receiverPhone],
+      phoneArray: [senderPhoneVerified, receiverPhoneVerified],
       senderUid: senderUidVerified,
       senderName: senderNameVerified,
-      senderPhone: this.senderPhone,
+      senderPhone: senderPhoneVerified,
       receiverName: receiverNameVerified,
-      receiverPhone: this.receiverPhone,
+      receiverPhone: receiverPhoneVerified,
       senderNotificationToken: senderNotificationTokenVerified,
       senderLocation: new firebaseAdminSdk.firestore.GeoPoint(
         parseInt(senderCoordinatesVerified.lat),

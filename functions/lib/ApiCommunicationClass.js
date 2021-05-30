@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const axios = require("axios");
 
-const CheckInformationClass = require("../lib/CheckInformationClass");
+const CheckInformationClass = require("./CheckInformationClass");
 
 class ApiCommunicationClass extends CheckInformationClass {
   // Find a user location using 'Nominatim'
