@@ -18,7 +18,6 @@ class ApiCommunicationClass extends CheckInformationClass {
     const region = response.data.address.region;
     const displayName = response.data.display_name;
     if (city || region || displayName) {
-      console.log(`city ${city} region ${region} displayName: ${displayName}`);
       return {
         city: response.data.address.city || "",
         region: response.data.address.region || "",

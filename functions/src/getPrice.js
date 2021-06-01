@@ -8,51 +8,53 @@ const DeliveryManagerClass = require("./DeliveryManagerClass");
 const ApiCommunicationClass = require("./ApiCommunicationClass");
 const UserClass = require("./UserClass");
 const status = require("./status");
-const NotificationClass = require("./NotificationClass");
 route.post("/", async (req, res) => {
   try {
     const dt = req.body;
     // Check if the user exists.
     const userIns = new UserClass();
     const senderInfo = await userIns.doesUserExists(
-      dt.senderPhone,
-      dt.senderUid
+      dt.receiverPhone,
+      dt.receiverUid
     );
 
     // Check if the delivery is not duplicated
     const deliveryManager = new DeliveryManagerClass();
-    // const deliveryDuplicated =
-    //   await deliveryManager.onGoingDeliveryIsDuplicated(
-    //     dt.senderPhone,
-    //     dt.receiverPhone
-    //   );
+    const phoneBelongToDelivery =
+      await deliveryManager.checkIfPhoneBelongToTheDelivery(
+        dt.receiverPhone,
+        dt.deliveryId
+      );
+
+    // Check if the price is already set.
+    const priceIsSet = await deliveryManager.priceAlreadySet(
+      phoneBelongToDelivery
+    );
+
     // Retrieve the location
     const apiCom = new ApiCommunicationClass();
-    const location = await apiCom.geoLocateUser(
-      dt.senderLongitude,
-      dt.senderLatitude
-    );
+    // const location = await apiCom.geoLocateUser(
+    //   dt.senderLongitude,
+    //   dt.senderLatitude
+    // );
 
     // Create the delivery
-    const deliveryParam = { ...dt, ...location };
-    const created = await deliveryManager.createDelivery(deliveryParam);
+    // const deliveryParam = { ...dt, ...location };
+    // const created = await deliveryManager.createDelivery(deliveryParam);
 
     // Send notification to the receiver.
-    const receiverInfo = await userIns.getUserByPhone(dt.receiverPhone);
-    const notification = new NotificationClass();
-    const title = `${senderInfo.name} vient de vous envoyer une livraison..`;
-    const bodyContent = "Veuillez confirmer pour recevoir la livraison.";
-    await notification.sendNotification(
-      title,
-      bodyContent,
-      receiverInfo.notificationToken
-    );
+    // const receiverInfo = await userIns.getUserByPhone(dt.receiverPhone);
+    // const notification = new NotificationClass();
+    // const title = `${senderInfo.name} vient de vous envoyer une livraison..`;
+    // const bodyContent = "Veuillez confirmer pour recevoir la livraison.";
+    // await notification.sendNotification(
+    //   title,
+    //   bodyContent,
+    //   receiverInfo.notificationToken
+    // );
 
     // Send a response.
-    res.send({
-      ...deliveryParam,
-      ...{ deliveryStatus: status.senderRegionNotValid },
-    });
+    res.send(phoneBelongToDelivery);
   } catch (error) {
     if (error.userMustBeNotified) {
       console.log(`${error.stack}`);

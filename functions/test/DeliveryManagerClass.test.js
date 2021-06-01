@@ -1,7 +1,17 @@
 const DeliveryManagerClass = require("../src/DeliveryManagerClass");
-const deliveryInstance = new DeliveryManagerClass();
+const firebaseAdminSdk = require("firebase-admin");
+const credential = require("../credential.json");
+
+firebaseAdminSdk.initializeApp({
+  credential: firebaseAdminSdk.credential.cert(credential),
+});
+const db = firebaseAdminSdk.firestore().settings({
+  host: "localhost:8080",
+  ssl: false,
+});
 
 // test("Test delivery creation", async () => {
+//   const deliveryInstance = new DeliveryManagerClass();
 //   // By tweaking the values you
 //   // can test methods.
 //   const __params__needed = {
@@ -23,16 +33,40 @@ const deliveryInstance = new DeliveryManagerClass();
 //   expect(returned).toBeTruthy();
 // });
 
+// test("Check if the delivery is not duplicated", async () => {
+//   const deliveryInstance = new DeliveryManagerClass();
+//   const __params__needed = {
+//     senderPhone: "+221773059798",
+//     receiverPhone: "+221774662232",
+//   };
+//   const returned = await deliveryInstance.onGoingDeliveryIsDuplicated(
+//     __params__needed.senderPhone,
+//     __params__needed.receiverPhone
+//   );
+//   expect(returned).toBeTruthy();
+// });
 
+// test("check if the phone is part of the delivery", async () => {
+//   const __params__needed = {
+//     phone: "+221774662232",
+//     deliveryId: "3FGG8q7QnWtUmKX0Ip0U",
+//   };
+//   const deliveryInstance = new DeliveryManagerClass();
+//   const returned = await deliveryInstance.checkIfPhoneBelongToTheDelivery(
+//     __params__needed.phone,
+//     __params__needed.deliveryId
+//   );
+//   expect(returned).toBeTruthy();
+// });
 
-test("Check if the delivery is not duplicated", async () => {
+test("check if the price is already set", async () => {
   const __params__needed = {
-    senderPhone: "+221773059798",
-    receiverPhone: "+221774662232",
+    phone: "+221774662232",
+    deliveryId: "3FGG8q7QnWtUmKX0Ip0U",
+    price: "2000",
   };
-  const returned = await deliveryInstance.onGoingDeliveryIsDuplicated(
-    __params__needed.senderPhone,
-    __params__needed.receiverPhone
-  );
+
+  const deliveryInstance = new DeliveryManagerClass();
+  const returned = await deliveryInstance.priceAlreadySet(__params__needed);
   expect(returned).toBeTruthy();
 });

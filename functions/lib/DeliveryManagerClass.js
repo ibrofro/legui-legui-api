@@ -7,6 +7,7 @@ const status = require("./status");
 class DeliveryManagerClass extends CheckInformationClass {
   constructor() {
     super();
+    this.collection = firebaseAdminSdk.firestore().collection("delivery");
   }
 
   async createDelivery(params) {
@@ -45,10 +46,10 @@ class DeliveryManagerClass extends CheckInformationClass {
   }
 
   async onGoingDeliveryIsDuplicated(senderPhone, receiverPhone) {
-    this.collection = firebaseAdminSdk.firestore().collection("delivery");
     const senderPhoneVerified = this.checkSnPhone(senderPhone);
     const receiverPhoneVerified = this.checkSnPhone(receiverPhone);
-    const querySnapshot = await this.collection.where("senderPhone", "==", senderPhoneVerified).where("receiverPhone", "==", receiverPhoneVerified).get();
+    const collection = firebaseAdminSdk.firestore().collection("delivery");
+    const querySnapshot = await collection.where("senderPhone", "==", senderPhoneVerified).where("receiverPhone", "==", receiverPhoneVerified).get();
 
     if (!querySnapshot.empty) {
       let found = false;
@@ -56,7 +57,6 @@ class DeliveryManagerClass extends CheckInformationClass {
         const dt = documentSnapshot.data();
 
         if (dt.status === status.waitingForReceiverConfirmation || dt.status === status.waitingForADeliverer || dt.status === status.onDelivery) {
-          console.log(dt.status);
           found = true;
         }
       });
@@ -71,6 +71,33 @@ class DeliveryManagerClass extends CheckInformationClass {
       }
     } else {
       return false;
+    }
+  }
+
+  async checkIfPhoneBelongToTheDelivery(phone, deliveryId) {
+    const documentSnapshot = await this.collection.doc(deliveryId).get();
+
+    if (documentSnapshot.exists) {
+      const senderPhone = documentSnapshot.data().senderPhone;
+      const receiverPhone = documentSnapshot.data().receiverPhone;
+
+      if (senderPhone === phone || receiverPhone === phone) {
+        return documentSnapshot.data();
+      } else {
+        throw new Error("This phone number is not part on the delivery");
+      }
+    } else {
+      throw new Error("This phone number is not part on the delivery");
+    }
+  }
+
+  async priceAlreadySet(deliveryObj) {
+    const price = deliveryObj.price;
+
+    if (!price) {
+      return true;
+    } else {
+      throw new Error("Price already set");
     }
   }
 

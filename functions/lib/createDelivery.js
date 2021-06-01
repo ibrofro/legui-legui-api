@@ -21,8 +21,12 @@ route.post("/", async (req, res) => {
     const userIns = new UserClass();
     const senderInfo = await userIns.doesUserExists(dt.senderPhone, dt.senderUid); // Check if the delivery is not duplicated
 
-    const deliveryManager = new DeliveryManagerClass();
-    const deliveryDuplicated = await deliveryManager.onGoingDeliveryIsDuplicated(dt.senderPhone, dt.receiverPhone); // Retrieve the location
+    const deliveryManager = new DeliveryManagerClass(); // const deliveryDuplicated =
+    //   await deliveryManager.onGoingDeliveryIsDuplicated(
+    //     dt.senderPhone,
+    //     dt.receiverPhone
+    //   );
+    // Retrieve the location
 
     const apiCom = new ApiCommunicationClass();
     const location = await apiCom.geoLocateUser(dt.senderLongitude, dt.senderLatitude); // Create the delivery

@@ -8,6 +8,7 @@ class DeliveryManagerClass extends CheckInformationClass {
   collection: any;
   constructor() {
     super();
+    this.collection = firebaseAdminSdk.firestore().collection("delivery");
   }
 
   async createDelivery(params: {
@@ -68,10 +69,11 @@ class DeliveryManagerClass extends CheckInformationClass {
     senderPhone: string,
     receiverPhone: string
   ): Promise<boolean> {
-    this.collection = firebaseAdminSdk.firestore().collection("delivery");
     const senderPhoneVerified = this.checkSnPhone(senderPhone);
     const receiverPhoneVerified = this.checkSnPhone(receiverPhone);
-    const querySnapshot = await this.collection
+
+    const collection = firebaseAdminSdk.firestore().collection("delivery");
+    const querySnapshot = await collection
       .where("senderPhone", "==", senderPhoneVerified)
       .where("receiverPhone", "==", receiverPhoneVerified)
       .get();
@@ -84,7 +86,6 @@ class DeliveryManagerClass extends CheckInformationClass {
           dt.status === status.waitingForADeliverer ||
           dt.status === status.onDelivery
         ) {
-          console.log(dt.status);
           found = true;
         }
       });
@@ -98,6 +99,33 @@ class DeliveryManagerClass extends CheckInformationClass {
       }
     } else {
       return false;
+    }
+  }
+
+  async checkIfPhoneBelongToTheDelivery(
+    phone: string,
+    deliveryId: string
+  ): Promise<{price:string}> {
+    const documentSnapshot = await this.collection.doc(deliveryId).get();
+    if (documentSnapshot.exists) {
+      const senderPhone = documentSnapshot.data().senderPhone;
+      const receiverPhone = documentSnapshot.data().receiverPhone;
+      if (senderPhone === phone || receiverPhone === phone) {
+        return documentSnapshot.data();
+      } else {
+        throw new Error("This phone number is not part on the delivery");
+      }
+    } else {
+      throw new Error("This phone number is not part on the delivery");
+    }
+  }
+
+  async priceAlreadySet(deliveryObj: { price: string }): Promise<boolean> {
+    const price = deliveryObj.price;
+    if (!price) {
+      return true;
+    } else {
+      throw new Error("Price already set");
     }
   }
 }
