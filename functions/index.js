@@ -3,13 +3,9 @@ const credential = require("./credential.json");
 const firebaseAdminSdk = require("firebase-admin");
 const createDelivery = require("./lib/createDelivery");
 const express = require("express");
-// const bodyParser = require("body-parser");
 const cors = require("cors");
 
-
-// Body parser.
 const app = express();
-// let bodyParser = app.use(bodyParser.json());
 // Admin Sdk configuration
 firebaseAdminSdk.initializeApp({
   credential: firebaseAdminSdk.credential.cert(credential),

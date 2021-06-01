@@ -1,14 +1,13 @@
 // @flow
 const firebaseAdminSdk = require("firebase-admin");
 const CheckInformationClass = require("./CheckInformationClass.js");
-
+const status = require("./status");
 class DeliveryManagerClass extends CheckInformationClass {
   senderPhone: string;
   receiverPhone: string;
   collection: any;
   constructor() {
     super();
-    this.collection = firebaseAdminSdk.firestore().collection("delivery");
   }
 
   async createDelivery(params: {
@@ -54,7 +53,7 @@ class DeliveryManagerClass extends CheckInformationClass {
       senderCity: params.city ? String(params.city) : "",
       senderAddress: params.displayName ? String(params.displayName) : "",
       senderRegion: super.checkIfRegionIsValid(params.region),
-      status: "waiting-for-receiver-confirmation",
+      status: status.waitingForADeliverer,
       createdAt: new Date(),
       price: "",
     });
@@ -62,6 +61,43 @@ class DeliveryManagerClass extends CheckInformationClass {
       return true;
     } else {
       throw new Error("Error while adding the delivery to Firestore");
+    }
+  }
+
+  async onGoingDeliveryIsDuplicated(
+    senderPhone: string,
+    receiverPhone: string
+  ): Promise<boolean> {
+    this.collection = firebaseAdminSdk.firestore().collection("delivery");
+    const senderPhoneVerified = this.checkSnPhone(senderPhone);
+    const receiverPhoneVerified = this.checkSnPhone(receiverPhone);
+    const querySnapshot = await this.collection
+      .where("senderPhone", "==", senderPhoneVerified)
+      .where("receiverPhone", "==", receiverPhoneVerified)
+      .get();
+    if (!querySnapshot.empty) {
+      let found = false;
+      querySnapshot.forEach((documentSnapshot) => {
+        const dt = documentSnapshot.data();
+        if (
+          dt.status === status.waitingForReceiverConfirmation ||
+          dt.status === status.waitingForADeliverer ||
+          dt.status === status.onDelivery
+        ) {
+          console.log(dt.status);
+          found = true;
+        }
+      });
+      if (found) {
+        // At this point duplicated delivery is found.
+        let err: any = new Error(status.ongoingDeliveryCannotBeDuplicated);
+        err.userMustBeNotified = status.ongoingDeliveryCannotBeDuplicated;
+        throw err;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
     }
   }
 }

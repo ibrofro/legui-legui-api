@@ -1,9 +1,13 @@
+/*
+ * @flow
+ */
 const app = require("express");
 const route: any = app.Router();
 const functions = require("firebase-functions");
 const DeliveryManagerClass = require("./DeliveryManagerClass");
 const ApiCommunicationClass = require("./ApiCommunicationClass");
 const UserClass = require("./UserClass");
+const status = require("./status");
 const NotificationClass = require("./NotificationClass");
 route.post("/", async (req, res) => {
   try {
@@ -15,6 +19,13 @@ route.post("/", async (req, res) => {
       dt.senderUid
     );
 
+    // Check if the delivery is not duplicated
+    const deliveryManager = new DeliveryManagerClass();
+    const deliveryDuplicated =
+      await deliveryManager.onGoingDeliveryIsDuplicated(
+        dt.senderPhone,
+        dt.receiverPhone
+      );
     // Retrieve the location
     const apiCom = new ApiCommunicationClass();
     const location = await apiCom.geoLocateUser(
@@ -34,7 +45,6 @@ route.post("/", async (req, res) => {
     );
 
     // Create the delivery
-    const deliveryManager = new DeliveryManagerClass();
     const deliveryParam = { ...dt, ...location };
     const created = await deliveryManager.createDelivery(deliveryParam);
 
@@ -44,9 +54,15 @@ route.post("/", async (req, res) => {
       ...{ deliveryStatus: "waiting-for-receiver-confirmation" },
     });
   } catch (error) {
-    console.log(`${error.stack}`);
-    res.status(500);
-    res.send("An error occurred");
+    if (error.userMustBeNotified) {
+      console.log(`${error.stack}`);
+      res.status(500);
+      res.json({deliveryStatus:error.userMustBeNotified});
+    } else {
+      console.log(`${error.stack}`);
+      res.status(500);
+      res.send("An error occurred");
+    }
   }
 });
 module.exports = route;
