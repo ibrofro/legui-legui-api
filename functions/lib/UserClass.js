@@ -10,7 +10,6 @@ class User extends CheckInformationClass {
       let user = {};
       querySnapshot.forEach(documentSnapshot => {
         const data = documentSnapshot.data();
-        console.log(data);
 
         if (!data.phone || !data.uid || !data.notificationToken || !data.name) {
           throw new Error("Error user retrieved is not a valid one");

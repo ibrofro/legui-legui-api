@@ -1,3 +1,5 @@
+const status = require("./status");
+
 class CheckInformationClass {
   checkName(name) {
     if (name.length > 2) {
@@ -48,7 +50,9 @@ class CheckInformationClass {
     if (regex.test(region)) {
       return region;
     } else {
-      throw new Error(`Only Dakar is supported as region.`);
+      let err = new Error(status.senderRegionNotValid);
+      err.userMustBeNotified = status.senderRegionNotValid;
+      throw err;
     }
   }
 

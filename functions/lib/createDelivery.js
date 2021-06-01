@@ -25,22 +25,22 @@ route.post("/", async (req, res) => {
     const deliveryDuplicated = await deliveryManager.onGoingDeliveryIsDuplicated(dt.senderPhone, dt.receiverPhone); // Retrieve the location
 
     const apiCom = new ApiCommunicationClass();
-    const location = await apiCom.geoLocateUser(dt.senderLongitude, dt.senderLatitude); // Send notification to the receiver.
+    const location = await apiCom.geoLocateUser(dt.senderLongitude, dt.senderLatitude); // Create the delivery
+
+    const deliveryParam = { ...dt,
+      ...location
+    };
+    const created = await deliveryManager.createDelivery(deliveryParam); // Send notification to the receiver.
 
     const receiverInfo = await userIns.getUserByPhone(dt.receiverPhone);
     const notification = new NotificationClass();
     const title = `${senderInfo.name} vient de vous envoyer une livraison..`;
     const bodyContent = "Veuillez confirmer pour recevoir la livraison.";
-    await notification.sendNotification(title, bodyContent, receiverInfo.notificationToken); // Create the delivery
-
-    const deliveryParam = { ...dt,
-      ...location
-    };
-    const created = await deliveryManager.createDelivery(deliveryParam); // Send a response.
+    await notification.sendNotification(title, bodyContent, receiverInfo.notificationToken); // Send a response.
 
     res.send({ ...deliveryParam,
       ...{
-        deliveryStatus: "waiting-for-receiver-confirmation"
+        deliveryStatus: status.senderRegionNotValid
       }
     });
   } catch (error) {

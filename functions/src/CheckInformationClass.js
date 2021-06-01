@@ -1,4 +1,5 @@
 // @flow
+const status = require("./status");
 class CheckInformationClass {
   checkName(name: string): string {
     if (name.length > 2) {
@@ -10,14 +11,14 @@ class CheckInformationClass {
     }
   }
 
-  checkIfExist(param: string):string {
+  checkIfExist(param: string): string {
     if (typeof param === "string" && param) {
       return param;
     } else {
       throw new Error(`The param '${param}' is not valid`);
     }
   }
- 
+
   checkCoordinates(lon: string, lat: string): { lon: string, lat: string } {
     const associated = lat + "," + lon;
     const regex =
@@ -35,8 +36,7 @@ class CheckInformationClass {
     if (regex.test(phone)) {
       return phone;
     } else {
-        throw new Error(`Invalid phone number '${phone}'`);
-      
+      throw new Error(`Invalid phone number '${phone}'`);
     }
   }
 
@@ -45,8 +45,9 @@ class CheckInformationClass {
     if (regex.test(region)) {
       return region;
     } else {
-        throw new Error(`Only Dakar is supported as region.`);
-      
+      let err: any = new Error(status.senderRegionNotValid);
+      err.userMustBeNotified = status.senderRegionNotValid;
+      throw err;
     }
   }
 }

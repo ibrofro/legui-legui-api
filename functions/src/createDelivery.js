@@ -33,6 +33,10 @@ route.post("/", async (req, res) => {
       dt.senderLatitude
     );
 
+    // Create the delivery
+    const deliveryParam = { ...dt, ...location };
+    const created = await deliveryManager.createDelivery(deliveryParam);
+
     // Send notification to the receiver.
     const receiverInfo = await userIns.getUserByPhone(dt.receiverPhone);
     const notification = new NotificationClass();
@@ -44,20 +48,16 @@ route.post("/", async (req, res) => {
       receiverInfo.notificationToken
     );
 
-    // Create the delivery
-    const deliveryParam = { ...dt, ...location };
-    const created = await deliveryManager.createDelivery(deliveryParam);
-
     // Send a response.
     res.send({
       ...deliveryParam,
-      ...{ deliveryStatus: "waiting-for-receiver-confirmation" },
+      ...{ deliveryStatus: status.senderRegionNotValid },
     });
   } catch (error) {
     if (error.userMustBeNotified) {
       console.log(`${error.stack}`);
       res.status(500);
-      res.json({deliveryStatus:error.userMustBeNotified});
+      res.json({ deliveryStatus: error.userMustBeNotified });
     } else {
       console.log(`${error.stack}`);
       res.status(500);
