@@ -45,8 +45,8 @@ class CheckInformationClass {
     if (regex.test(region)) {
       return region;
     } else {
-      let err: any = new Error(status.senderRegionNotValid);
-      err.userMustBeNotified = status.senderRegionNotValid;
+      let err: any = new Error(status.regionNotValid);
+      err.userMustBeNotified = status.regionNotValid;
       throw err;
     }
   }

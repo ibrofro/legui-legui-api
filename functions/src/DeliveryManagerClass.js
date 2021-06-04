@@ -81,6 +81,7 @@ class DeliveryManagerClass extends CheckInformationClass {
       let found = false;
       querySnapshot.forEach((documentSnapshot) => {
         const dt = documentSnapshot.data();
+        console.log(dt.status)
         if (
           dt.status === status.waitingForReceiverConfirmation ||
           dt.status === status.waitingForADeliverer ||
@@ -103,20 +104,20 @@ class DeliveryManagerClass extends CheckInformationClass {
   }
 
   async checkIfPhoneBelongToTheDelivery(
-    phone: string,
-    deliveryId: string
-  ): Promise<{price:string}> {
-    const documentSnapshot = await this.collection.doc(deliveryId).get();
-    if (documentSnapshot.exists) {
-      const senderPhone = documentSnapshot.data().senderPhone;
-      const receiverPhone = documentSnapshot.data().receiverPhone;
-      if (senderPhone === phone || receiverPhone === phone) {
-        return documentSnapshot.data();
-      } else {
-        throw new Error("This phone number is not part on the delivery");
-      }
+    receiverPhone: string,
+    senderPhoneOnDb: string,
+    receiverPhoneOnDb: string,
+    errorHandler: Function
+  ): Promise<boolean | Function> {
+   
+    if (
+      receiverPhone === senderPhoneOnDb ||
+      receiverPhone  === receiverPhoneOnDb
+    ) {
+      return true;
     } else {
-      throw new Error("This phone number is not part on the delivery");
+      const err = new Error("This phone number is not part on the delivery");
+      return errorHandler(err);
     }
   }
 
@@ -128,6 +129,33 @@ class DeliveryManagerClass extends CheckInformationClass {
       throw new Error("Price already set");
     }
   }
-}
 
+  calculatePrice(
+    distanceInMeters: number,
+    priceByKilometers: number
+  ): { price: number } {
+    if (distanceInMeters && priceByKilometers) {
+      if (distanceInMeters <= 8500) {
+        return { price: 1500 };
+      }
+      const price =
+        Math.round(
+          Math.round((distanceInMeters * priceByKilometers) / 1000) / 100
+        ) * 100;
+      return { price: price };
+    } else {
+      throw new Error("Error while calculating the price,");
+    }
+  }
+
+  async updateDeliveryOnDb(deliveryId: string, params: {}): Promise<{}> {
+    await this.collection.doc(deliveryId).update(params);
+    return params;
+  }
+
+  async getDeliveryById(deliveryId: string): Promise<any> {
+    const delivery = await this.collection.doc(deliveryId).get();
+    return delivery.data();
+  }
+}
 module.exports = DeliveryManagerClass;

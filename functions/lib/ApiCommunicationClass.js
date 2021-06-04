@@ -26,6 +26,27 @@ class ApiCommunicationClass extends CheckInformationClass {
     }
   }
 
+  async getDistance(params) {
+    this.checkCoordinates(params.senderLon, params.senderLat);
+    this.checkCoordinates(params.receiverLon, params.receiverLat);
+    const apiToken = process.env.MAPBOX_TOKEN;
+    const request = "https://api.mapbox.com/directions/v5/mapbox/driving/" + params.senderLon + "," + params.senderLat + ";" + params.receiverLon + "," + params.receiverLat + "?access_token=" + apiToken;
+    const response = await axios.get(request);
+
+    if (response.data.routes[0].distance) {
+      const roundedDistanceInMeters = Math.round(response.data.routes[0].distance); // Information to retain from the API response
+
+      const distanceInKilometers = roundedDistanceInMeters / 1000;
+      const distanceInMeters = roundedDistanceInMeters;
+      return {
+        distanceInKilometers: distanceInKilometers,
+        distanceInMeters: distanceInMeters
+      };
+    } else {
+      throw new Error("Error while retrieving the distance");
+    }
+  }
+
 }
 
 module.exports = ApiCommunicationClass;

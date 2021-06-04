@@ -3,6 +3,7 @@ const status = {
   waitingForADeliverer: "waiting-for-a-deliverer",
   onDelivery: "on-delivery",
   deliveryCompleted: "delivery-completed",
+  regionNotValid: "region-not-valid",
   senderRegionNotValid: "sender-region-not-valid",
   receiverRegionNotValid: "receiver-region-not-valid",
   abortedBySender: "aborted-by-sender",

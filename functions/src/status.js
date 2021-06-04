@@ -8,8 +8,9 @@ const status = {
   waitingForADeliverer: "waiting-for-a-deliverer",
   onDelivery: "on-delivery",
   deliveryCompleted: "delivery-completed",
-  senderRegionNotValid: "sender-region-not-valid",
-  receiverRegionNotValid: "receiver-region-not-valid",
+  regionNotValid: "region-not-valid",
+  senderRegionNotValid:"sender-region-not-valid",
+  receiverRegionNotValid:"receiver-region-not-valid",
   abortedBySender: "aborted-by-sender",
   abortedByReceiver: "aborted-by-receiver",
   ongoingDeliveryCannotBeDuplicated:"ongoing-delivery-cannot-be-duplicated"

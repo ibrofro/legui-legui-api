@@ -51,7 +51,7 @@ route.post("/", async (req, res) => {
     // Send a response.
     res.send({
       ...deliveryParam,
-      ...{ deliveryStatus: status.senderRegionNotValid },
+      ...{ deliveryStatus: status.waitingForReceiverConfirmation },
     });
   } catch (error) {
     if (error.userMustBeNotified) {

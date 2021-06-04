@@ -1,7 +1,6 @@
 const DeliveryManagerClass = require("../src/DeliveryManagerClass");
 const firebaseAdminSdk = require("firebase-admin");
 const credential = require("../credential.json");
-
 firebaseAdminSdk.initializeApp({
   credential: firebaseAdminSdk.credential.cert(credential),
 });
@@ -59,14 +58,51 @@ const db = firebaseAdminSdk.firestore().settings({
 //   expect(returned).toBeTruthy();
 // });
 
-test("check if the price is already set", async () => {
-  const __params__needed = {
-    phone: "+221774662232",
+// test("check if the price is already set", async () => {
+//   const __params__needed = {
+//     phone: "+221774662232",
+//     deliveryId: "3FGG8q7QnWtUmKX0Ip0U",
+//     price: "2000",
+//   };
+
+//   const deliveryInstance = new DeliveryManagerClass();
+//   const returned = await deliveryInstance.priceAlreadySet(__params__needed);
+//   expect(returned).toBeTruthy();
+// });
+
+// test("check the price calculation", async () => {
+//   const ApiCommunicationClass = require("../src/ApiCommunicationClass");
+//   const comInstance = new ApiCommunicationClass();
+//   const params_needed = {
+//     senderLon: " -17.393234968185425",
+//     senderLat: "14.777112924434288",
+//     receiverLon: " -17.437459230422974",
+//     receiverLat: "14.675299596762388",
+//   };
+
+//   const distance = await comInstance.getDistance(params_needed);
+//   const deliveryInstance = new DeliveryManagerClass();
+//   const result = await deliveryInstance.calculatePrice(
+//    8000,
+//     180                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+//   );
+//   console.log(`Distance => ${distance.distanceInMeters}`);
+//   console.log(`Price => ${result.price}`);
+
+//   expect(result.price).toBeTruthy();
+// });
+
+
+test("update the price", async () => {
+  
+  const params_needed = {
     deliveryId: "3FGG8q7QnWtUmKX0Ip0U",
-    price: "2000",
+    price: 3500,
+    
   };
 
   const deliveryInstance = new DeliveryManagerClass();
-  const returned = await deliveryInstance.priceAlreadySet(__params__needed);
-  expect(returned).toBeTruthy();
+  const result = await deliveryInstance.updateDeliveryPriceOnDb(params_needed);
+  console.log(`result => ${JSON.stringify(result)}`);
+  expect(result.price).toBeTruthy();
 });

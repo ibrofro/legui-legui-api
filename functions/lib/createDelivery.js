@@ -44,7 +44,7 @@ route.post("/", async (req, res) => {
 
     res.send({ ...deliveryParam,
       ...{
-        deliveryStatus: status.senderRegionNotValid
+        deliveryStatus: status.waitingForReceiverConfirmation
       }
     });
   } catch (error) {
