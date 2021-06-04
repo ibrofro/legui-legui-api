@@ -47,14 +47,12 @@ class DeliveryManagerClass extends CheckInformationClass {
       receiverName: receiverNameVerified,
       receiverPhone: receiverPhoneVerified,
       senderNotificationToken: senderNotificationTokenVerified,
-      senderLocation: new firebaseAdminSdk.firestore.GeoPoint(
-        parseInt(senderCoordinatesVerified.lat),
-        parseInt(senderCoordinatesVerified.lon)
-      ),
+      senderLongitude: senderCoordinatesVerified.lon,
+      senderLatitude: senderCoordinatesVerified.lat,
       senderCity: params.city ? String(params.city) : "",
       senderAddress: params.displayName ? String(params.displayName) : "",
       senderRegion: super.checkIfRegionIsValid(params.region),
-      status: status.waitingForADeliverer,
+      status: status.waitingForReceiverConfirmation,
       createdAt: new Date(),
       price: "",
     });
@@ -81,7 +79,7 @@ class DeliveryManagerClass extends CheckInformationClass {
       let found = false;
       querySnapshot.forEach((documentSnapshot) => {
         const dt = documentSnapshot.data();
-        console.log(dt.status)
+        console.log(dt.status);
         if (
           dt.status === status.waitingForReceiverConfirmation ||
           dt.status === status.waitingForADeliverer ||
@@ -109,10 +107,9 @@ class DeliveryManagerClass extends CheckInformationClass {
     receiverPhoneOnDb: string,
     errorHandler: Function
   ): Promise<boolean | Function> {
-   
     if (
       receiverPhone === senderPhoneOnDb ||
-      receiverPhone  === receiverPhoneOnDb
+      receiverPhone === receiverPhoneOnDb
     ) {
       return true;
     } else {

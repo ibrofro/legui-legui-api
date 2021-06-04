@@ -17,14 +17,20 @@ route.post("/", async (req, res) => {
     const deliveryManager = new DeliveryManagerClass();
     const delivery = await deliveryManager.getDeliveryById(dt.deliveryId);
 
-    
-    // Verify if the status wasn't region-not-valid.
+    /////////////////////////////////////////////////////////
+    // Verify if the status wasn't wasn't region-not-valid.
+    // or waiting-for-a deliverer.
+    /////////////////////////////////////////////////////////
     const statusFromDb = delivery.status;
-    if (
-      statusFromDb === status.senderRegionNotValid ||
-      statusFromDb === status.receiverRegionNotValid
-    ) {
-      throw new Error("region was invalid");
+    switch (statusFromDb) {
+      case status.senderRegionNotValid:
+        throw new Error("sender region not invalid");
+
+      case status.receiverRegionNotValid:
+        throw new Error("receiver region not invalid");
+
+      case status.waitingForADeliverer:
+        throw new Error("Delivery already setup");
     }
 
     // Check if the user exists.
@@ -37,17 +43,14 @@ route.post("/", async (req, res) => {
     // Check if user is part of the delivery
     const phoneBelongToDelivery =
       await deliveryManager.checkIfPhoneBelongToTheDelivery(
-        delivery.receiverPhone,
-        dt.senderPhone,
         dt.receiverPhone,
+        delivery.senderPhone,
+        delivery.receiverPhone,
         (err) => {
           console.error(err);
           throw err;
         }
       );
-
-    // Check if the price is already set.
-    const priceIsSet = await deliveryManager.priceAlreadySet(delivery);
 
     // Retrieve the location of the user.
     const apiCom = new ApiCommunicationClass();
@@ -73,14 +76,33 @@ route.post("/", async (req, res) => {
       distance.distanceInMeters,
       180
     );
-
-    // Update the price on the database
-    const result = await deliveryManager.updateDeliveryOnDb(dt.deliveryId, {
+    let dataToAdd = {
+      receiverUid: checkInstance.checkIfExist(dt.receiverUid),
+      receiverLongitude: checkInstance.checkCoordinates(
+        dt.receiverLongitude,
+        dt.receiverLatitude
+      ).lon,
+      receiverLatitude: dt.receiverLatitude,
+      receiverRegion: checkInstance.checkIfRegionIsValid(location.region),
+      receiverCity: location.city,
+      receiverAddress: location.displayName,
+      receiverNotificationToken: checkInstance.checkIfExist(
+        dt.receiverNotificationToken
+      ),
       price: `${resultOfCalculation.price}`,
+    };
+
+    // Update the delivery on the database
+    const result = await deliveryManager.updateDeliveryOnDb(dt.deliveryId, {
+      ...dataToAdd,
+      ...{ status: status.waitingForADeliverer },
     });
 
     // Send a response.
-    res.send(resultOfCalculation);
+    res.send({
+      ...dataToAdd,
+      ...{ deliveryStatus: status.waitingForADeliverer },
+    });
   } catch (error) {
     if (error.userMustBeNotified) {
       console.log(`${error.stack}`);

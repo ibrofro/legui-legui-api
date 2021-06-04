@@ -21,11 +21,11 @@ route.post("/", async (req, res) => {
 
     // Check if the delivery is not duplicated
     const deliveryManager = new DeliveryManagerClass();
-    // const deliveryDuplicated =
-    //   await deliveryManager.onGoingDeliveryIsDuplicated(
-    //     dt.senderPhone,
-    //     dt.receiverPhone
-    //   );
+    const deliveryDuplicated =
+      await deliveryManager.onGoingDeliveryIsDuplicated(
+        dt.senderPhone,
+        dt.receiverPhone
+      );
     // Retrieve the location
     const apiCom = new ApiCommunicationClass();
     const location = await apiCom.geoLocateUser(

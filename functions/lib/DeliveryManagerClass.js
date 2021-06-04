@@ -29,11 +29,12 @@ class DeliveryManagerClass extends CheckInformationClass {
       receiverName: receiverNameVerified,
       receiverPhone: receiverPhoneVerified,
       senderNotificationToken: senderNotificationTokenVerified,
-      senderLocation: new firebaseAdminSdk.firestore.GeoPoint(parseInt(senderCoordinatesVerified.lat), parseInt(senderCoordinatesVerified.lon)),
+      senderLongitude: senderCoordinatesVerified.lon,
+      senderLatitude: senderCoordinatesVerified.lat,
       senderCity: params.city ? String(params.city) : "",
       senderAddress: params.displayName ? String(params.displayName) : "",
       senderRegion: super.checkIfRegionIsValid(params.region),
-      status: status.waitingForADeliverer,
+      status: status.waitingForReceiverConfirmation,
       createdAt: new Date(),
       price: ""
     });
