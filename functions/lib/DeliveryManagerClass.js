@@ -31,6 +31,8 @@ class DeliveryManagerClass extends CheckInformationClass {
       senderNotificationToken: senderNotificationTokenVerified,
       senderLongitude: senderCoordinatesVerified.lon,
       senderLatitude: senderCoordinatesVerified.lat,
+      senderPayer: params.senderPayer,
+      receiverPayer: params.receiverPayer,
       senderCity: params.city ? String(params.city) : "",
       senderAddress: params.displayName ? String(params.displayName) : "",
       senderRegion: super.checkIfRegionIsValid(params.region),
@@ -56,7 +58,6 @@ class DeliveryManagerClass extends CheckInformationClass {
       let found = false;
       querySnapshot.forEach(documentSnapshot => {
         const dt = documentSnapshot.data();
-        console.log(dt.status);
 
         if (dt.status === status.waitingForReceiverConfirmation || dt.status === status.waitingForADeliverer || dt.status === status.onDelivery) {
           found = true;

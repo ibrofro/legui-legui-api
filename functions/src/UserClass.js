@@ -4,6 +4,7 @@
 
 const firebaseAdminSdk = require("firebase-admin");
 const CheckInformationClass = require("./CheckInformationClass");
+const status = require("./status");
 class User extends CheckInformationClass {
   async doesUserExists(
     phone: string,
@@ -40,9 +41,7 @@ class User extends CheckInformationClass {
     }
   }
 
-  async getUserByPhone(
-    phone: string
-  ): Promise<{
+  async getUserByPhone(phone: string): Promise<{
     phone: string,
     uid: string,
     name: string,
@@ -58,7 +57,9 @@ class User extends CheckInformationClass {
       querySnapshot.forEach((documentSnapshot) => {
         const data = documentSnapshot.data();
         if (!data.phone || !data.uid || !data.notificationToken || !data.name) {
-          throw new Error("Error user retrieved is not a valid one");
+          let err: any = new Error(status.phoneNotRegistered);
+          err.userMustBeNotified = status.phoneNotRegistered;
+          throw err;
         }
         user = {
           phone: data.phone,
@@ -69,9 +70,9 @@ class User extends CheckInformationClass {
       });
       return user;
     } else {
-      throw new Error(
-        "Error while fetching the user with the given phone number"
-      );
+      let err: any = new Error(status.phoneNotRegistered);
+      err.userMustBeNotified = status.phoneNotRegistered;
+      throw err;
     }
   }
 }

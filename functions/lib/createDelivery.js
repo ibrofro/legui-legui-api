@@ -14,12 +14,22 @@ const status = require("./status");
 
 const NotificationClass = require("./NotificationClass");
 
+const CheckInformationClass = require("./CheckInformationClass");
+
 route.post("/", async (req, res) => {
   try {
     const dt = req.body; // Check if the user exists.
 
     const userIns = new UserClass();
-    const senderInfo = await userIns.doesUserExists(dt.senderPhone, dt.senderUid); // Check if the delivery is not duplicated
+    const senderInfo = await userIns.doesUserExists(dt.senderPhone, dt.senderUid); // Check the if the receiver exist
+
+    const receiverInfo = await userIns.getUserByPhone(dt.receiverPhone); // Check if the price exist.
+    // const checkInstance = new CheckInformationClass();
+
+    if (dt.senderPayer === false && dt.receiverPayer === false) {
+      throw new Error("No payer specified");
+    } // Check if the delivery is not duplicated
+
 
     const deliveryManager = new DeliveryManagerClass();
     const deliveryDuplicated = await deliveryManager.onGoingDeliveryIsDuplicated(dt.senderPhone, dt.receiverPhone); // Retrieve the location
@@ -32,7 +42,6 @@ route.post("/", async (req, res) => {
     };
     const created = await deliveryManager.createDelivery(deliveryParam); // Send notification to the receiver.
 
-    const receiverInfo = await userIns.getUserByPhone(dt.receiverPhone);
     const notification = new NotificationClass();
     const title = `${senderInfo.name} vient de vous envoyer une livraison..`;
     const bodyContent = "Veuillez confirmer pour recevoir la livraison.";

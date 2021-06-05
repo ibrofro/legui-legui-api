@@ -13,7 +13,8 @@ const status = {
   receiverRegionNotValid:"receiver-region-not-valid",
   abortedBySender: "aborted-by-sender",
   abortedByReceiver: "aborted-by-receiver",
-  ongoingDeliveryCannotBeDuplicated:"ongoing-delivery-cannot-be-duplicated"
+  ongoingDeliveryCannotBeDuplicated:"ongoing-delivery-cannot-be-duplicated",
+  phoneNotRegistered:"phone-not-registered"
 };
 
 module.exports = status;
