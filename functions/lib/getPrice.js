@@ -49,7 +49,15 @@ route.post("/", async (req, res) => {
       senderLat: delivery.senderLatitude,
       receiverLon: dt.receiverLongitude,
       receiverLat: dt.receiverLatitude
-    }); // Get the price
+    }); // Block the delivery when the distance is less than
+    // 100 meters.
+
+    if (distance.distanceInMeters < 75) {
+      let err = new Error(status.closeDistance);
+      err.userMustBeNotified = status.closeDistance;
+      throw err;
+    } // Get the price
+
 
     const resultOfCalculation = deliveryManager.calculatePrice(distance.distanceInMeters, 180); // Update the price on the database
 
@@ -62,18 +70,18 @@ route.post("/", async (req, res) => {
     if (error.userMustBeNotified) {
       console.log(`${error.stack}`);
 
-      if (error.userMustBeNotified === status.regionNotValid) {
+      if (error.userMustBeNotified === status.regionNotValid || error.userMustBeNotified === status.closeDistance) {
         (async () => {
           const deliveryManager = new DeliveryManagerClass();
           const result = await deliveryManager.updateDeliveryOnDb(req.body.deliveryId, {
-            status: status.receiverRegionNotValid
+            status: error.userMustBeNotified
           });
         })();
       }
 
       res.status(500);
       res.json({
-        deliveryStatus: status.receiverRegionNotValid
+        deliveryStatus: error.userMustBeNotified
       });
     } else {
       console.log(`${error.stack}`);

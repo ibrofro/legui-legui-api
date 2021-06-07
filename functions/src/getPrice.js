@@ -17,7 +17,6 @@ route.post("/", async (req, res) => {
     const deliveryManager = new DeliveryManagerClass();
     const delivery = await deliveryManager.getDeliveryById(dt.deliveryId);
 
-    
     // Verify if the status wasn't region-not-valid.
     const statusFromDb = delivery.status;
     if (
@@ -68,6 +67,13 @@ route.post("/", async (req, res) => {
       receiverLat: dt.receiverLatitude,
     });
 
+    // Block the delivery when the distance is less than
+    // 100 meters.
+    if (distance.distanceInMeters < 75) {
+      let err: any = new Error(status.closeDistance);
+      err.userMustBeNotified = status.closeDistance;
+      throw err;
+    }
     // Get the price
     const resultOfCalculation = deliveryManager.calculatePrice(
       distance.distanceInMeters,
@@ -84,19 +90,22 @@ route.post("/", async (req, res) => {
   } catch (error) {
     if (error.userMustBeNotified) {
       console.log(`${error.stack}`);
-      if (error.userMustBeNotified === status.regionNotValid) {
+      if (
+        error.userMustBeNotified === status.regionNotValid ||
+        error.userMustBeNotified === status.closeDistance
+      ) {
         (async () => {
           const deliveryManager = new DeliveryManagerClass();
           const result = await deliveryManager.updateDeliveryOnDb(
             req.body.deliveryId,
             {
-              status: status.receiverRegionNotValid,
+              status: error.userMustBeNotified,
             }
           );
         })();
       }
       res.status(500);
-      res.json({ deliveryStatus: status.receiverRegionNotValid });
+      res.json({ deliveryStatus: error.userMustBeNotified });
     } else {
       console.log(`${error.stack}`);
       res.status(500);

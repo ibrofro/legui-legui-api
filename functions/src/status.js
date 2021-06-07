@@ -14,7 +14,8 @@ const status = {
   abortedBySender: "aborted-by-sender",
   abortedByReceiver: "aborted-by-receiver",
   ongoingDeliveryCannotBeDuplicated:"ongoing-delivery-cannot-be-duplicated",
-  phoneNotRegistered:"phone-not-registered"
+  phoneNotRegistered:"phone-not-registered",
+  closeDistance:"close-distance",
 };
 
 module.exports = status;
