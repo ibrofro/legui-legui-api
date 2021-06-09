@@ -14,15 +14,14 @@ const status = require("./status");
 
 const CheckInformationClass = require("./CheckInformationClass");
 
+const NotificationClass = require("./NotificationClass");
+
 route.post("/", async (req, res) => {
   try {
     const dt = req.body; // Get the delivery
 
     const deliveryManager = new DeliveryManagerClass();
-    const delivery = await deliveryManager.getDeliveryById(dt.deliveryId); /////////////////////////////////////////////////////////
-    // Verify if the status wasn't wasn't region-not-valid.
-    // or waiting-for-a deliverer.
-    /////////////////////////////////////////////////////////
+    const delivery = await deliveryManager.getDeliveryById(dt.deliveryId); // Verify the status.
 
     const statusFromDb = delivery.status;
 
@@ -57,7 +56,15 @@ route.post("/", async (req, res) => {
       senderLat: delivery.senderLatitude,
       receiverLon: dt.receiverLongitude,
       receiverLat: dt.receiverLatitude
-    }); // Get the price
+    }); // Block the delivery when the distance is less than
+    // 100 meters.
+
+    if (distance.distanceInMeters < 75) {
+      let err = new Error(status.closeDistance);
+      err.userMustBeNotified = status.closeDistance;
+      throw err;
+    } // Get the price
+
 
     const resultOfCalculation = deliveryManager.calculatePrice(distance.distanceInMeters, 180);
     let dataToAdd = {
@@ -75,7 +82,12 @@ route.post("/", async (req, res) => {
       ...{
         status: status.waitingForADeliverer
       }
-    }); // Send a response.
+    }); // Send notification to the receiver.
+
+    const notification = new NotificationClass();
+    const title = `${delivery.receiverName || delivery.receiverPhone} vient de  confimer la livraison.`;
+    const bodyContent = "Un livreur est en route pour effectuer la livraison.";
+    await notification.sendNotification(title, bodyContent, delivery.senderNotificationToken); // Send a response.
 
     res.send({ ...dataToAdd,
       ...{
@@ -86,13 +98,26 @@ route.post("/", async (req, res) => {
     if (error.userMustBeNotified) {
       console.log(`${error.stack}`);
 
-      if (error.userMustBeNotified === status.regionNotValid) {
-        (async () => {
-          const deliveryManager = new DeliveryManagerClass();
-          const result = await deliveryManager.updateDeliveryOnDb(req.body.deliveryId, {
-            status: status.receiverRegionNotValid
-          });
-        })();
+      switch (error.userMustBeNotified) {
+        case status.regionNotValid:
+          (async () => {
+            const deliveryManager = new DeliveryManagerClass();
+            const result = await deliveryManager.updateDeliveryOnDb(req.body.deliveryId, {
+              status: status.receiverRegionNotValid
+            });
+          })();
+
+          break;
+
+        case status.closeDistance:
+          (async () => {
+            const deliveryManager = new DeliveryManagerClass();
+            const result = await deliveryManager.updateDeliveryOnDb(req.body.deliveryId, {
+              status: status.closeDistance
+            });
+          })();
+
+          break;
       }
 
       res.status(500);

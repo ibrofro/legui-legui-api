@@ -90,19 +90,30 @@ route.post("/", async (req, res) => {
   } catch (error) {
     if (error.userMustBeNotified) {
       console.log(`${error.stack}`);
-      if (
-        error.userMustBeNotified === status.regionNotValid ||
-        error.userMustBeNotified === status.closeDistance
-      ) {
-        (async () => {
-          const deliveryManager = new DeliveryManagerClass();
-          const result = await deliveryManager.updateDeliveryOnDb(
-            req.body.deliveryId,
-            {
-              status: error.userMustBeNotified,
-            }
-          );
-        })();
+      switch (error.userMustBeNotified) {
+        case status.regionNotValid:
+          (async () => {
+            const deliveryManager = new DeliveryManagerClass();
+            const result = await deliveryManager.updateDeliveryOnDb(
+              req.body.deliveryId,
+              {
+                status: status.receiverRegionNotValid,
+              }
+            );
+          })();
+          break;
+
+        case status.closeDistance:
+          (async () => {
+            const deliveryManager = new DeliveryManagerClass();
+            const result = await deliveryManager.updateDeliveryOnDb(
+              req.body.deliveryId,
+              {
+                status: status.closeDistance,
+              }
+            );
+          })();
+          break;
       }
       res.status(500);
       res.json({ deliveryStatus: error.userMustBeNotified });

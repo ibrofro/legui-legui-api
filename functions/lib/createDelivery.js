@@ -45,15 +45,11 @@ route.post("/", async (req, res) => {
       ...location
     };
     const created = await deliveryManager.createDelivery(deliveryParam); // Send notification to the receiver.
-    // const notification = new NotificationClass();
-    // const title = `${senderInfo.name} vient de vous envoyer une livraison..`;
-    // const bodyContent = "Veuillez confirmer pour recevoir la livraison.";
-    // await notification.sendNotification(
-    //   title,
-    //   bodyContent,
-    //   receiverInfo.notificationToken
-    // );
-    // Send a response.
+
+    const notification = new NotificationClass();
+    const title = `${senderInfo.name} vient de vous envoyer une livraison..`;
+    const bodyContent = "Veuillez confirmer pour recevoir la livraison.";
+    await notification.sendNotification(title, bodyContent, receiverInfo.notificationToken); // Send a response.
 
     res.send({ ...deliveryParam,
       ...{
