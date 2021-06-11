@@ -35,6 +35,8 @@ class DeliveryManagerClass extends CheckInformationClass {
       receiverPayer: params.receiverPayer,
       deletedBySender: false,
       deletedByReceiver: false,
+      senderNotification: [],
+      receiverNotification: [],
       senderCity: params.city ? String(params.city) : "",
       senderAddress: params.displayName ? String(params.displayName) : "",
       senderRegion: super.checkIfRegionIsValid(params.region),
