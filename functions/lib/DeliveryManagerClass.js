@@ -46,7 +46,7 @@ class DeliveryManagerClass extends CheckInformationClass {
     });
 
     if (result.id) {
-      return true;
+      return result;
     } else {
       throw new Error("Error while adding the delivery to Firestore");
     }

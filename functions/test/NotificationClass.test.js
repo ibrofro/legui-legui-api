@@ -20,8 +20,9 @@ const notificationInstance = new NotificationClass();
 
 test("send notification test ", async () => {
   const result = await notificationInstance.addNotification(
-    "mt4TYr22teGKtEvDbq9L",
-    "Only for sender.",
+    "7KrWtxNF9YGg2yii42a9",
+    "Amazing right!!!!",
+    "receiver",
     "sender",
     err => console.log(err)
   );

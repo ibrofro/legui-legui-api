@@ -25,7 +25,7 @@ class DeliveryManagerClass extends CheckInformationClass {
     displayName: string,
     senderPayer:boolean,
     receiverPayer:boolean
-  }): Promise<boolean> {
+  }): Promise<{id:string}> {
     const senderUidVerified = super.checkIfExist(params.senderUid);
     const senderNameVerified = super.checkName(params.senderName);
     const receiverNameVerified = super.checkName(params.receiverName);
@@ -65,7 +65,7 @@ class DeliveryManagerClass extends CheckInformationClass {
       price: "",
     });
     if (result.id) {
-      return true;
+      return result;
     } else {
       throw new Error("Error while adding the delivery to Firestore");
     }

@@ -16,6 +16,8 @@ const CheckInformationClass = require("./CheckInformationClass");
 
 const NotificationClass = require("./NotificationClass");
 
+const notificationList = require("./notificationList");
+
 route.post("/", async (req, res) => {
   try {
     const dt = req.body; // Get the delivery
@@ -87,7 +89,11 @@ route.post("/", async (req, res) => {
     const notification = new NotificationClass();
     const title = `${delivery.receiverName || delivery.receiverPhone} vient de  confimer la livraison.`;
     const bodyContent = "Un livreur est en route pour effectuer la livraison.";
-    await notification.sendNotification(title, bodyContent, delivery.senderNotificationToken); // Send a response.
+    await notification.sendNotification(title, bodyContent, delivery.senderNotificationToken); // Add notification to database.
+
+    await notification.addNotification(dt.deliveryId, notificationList.configDoneBoth, "sender", "receiver", err => {
+      throw err;
+    }); // Send a response.
 
     res.send({ ...dataToAdd,
       ...{

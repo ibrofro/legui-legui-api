@@ -10,6 +10,7 @@ const UserClass = require("./UserClass");
 const status = require("./status");
 const NotificationClass = require("./NotificationClass");
 const CheckInformationClass = require("./CheckInformationClass");
+const notificationList = require("./notificationList");
 route.post("/", async (req, res) => {
   try {
     const dt = req.body;
@@ -36,7 +37,6 @@ route.post("/", async (req, res) => {
     //     dt.receiverPhone
     //   );
 
-      
     // Retrieve the location
     const apiCom = new ApiCommunicationClass();
     const location = await apiCom.geoLocateUser(
@@ -46,7 +46,7 @@ route.post("/", async (req, res) => {
 
     // Create the delivery
     const deliveryParam = { ...dt, ...location };
-    const created = await deliveryManager.createDelivery(deliveryParam);
+    const result = await deliveryManager.createDelivery(deliveryParam);
 
     // Send notification to the receiver.
     const notification = new NotificationClass();
@@ -56,6 +56,23 @@ route.post("/", async (req, res) => {
       title,
       bodyContent,
       receiverInfo.notificationToken
+    );
+    // Add notification to database.
+    await notification.addNotification(
+      result.id,
+      notificationList.holdOnForADelivererSender,
+      "sender",
+      (err) => {
+        throw err;
+      }
+    );
+    await notification.addNotification(
+      result.id,
+      notificationList.holdOnForADelivererReceiver,
+      "receiver",
+      (err) => {
+        throw err;
+      }
     );
 
     // Send a response.

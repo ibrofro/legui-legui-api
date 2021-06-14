@@ -10,6 +10,7 @@ const UserClass = require("./UserClass");
 const status = require("./status");
 const CheckInformationClass = require("./CheckInformationClass");
 const NotificationClass = require("./NotificationClass");
+const notificationList = require("./notificationList");
 route.post("/", async (req, res) => {
   try {
     const dt = req.body;
@@ -115,7 +116,16 @@ route.post("/", async (req, res) => {
       bodyContent,
       delivery.senderNotificationToken
     );
-
+    // Add notification to database.
+    await notification.addNotification(
+      dt.deliveryId,
+      notificationList.configDoneBoth,
+      "sender",
+      "receiver",
+      (err) => {
+        throw err;
+      }
+    );
     // Send a response.
     res.send({
       ...dataToAdd,
