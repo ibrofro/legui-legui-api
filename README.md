@@ -14,7 +14,8 @@ firebase login
  [official link](https://console.firebase.google.com/ "Google's Homepage")
 - Install the Local Emulator Suite follow this [official link](https://firebase.google.com/docs/emulator-suite/install_and_configure "Emulator suite") to install it
 - When firebase CLI prompted you for services to install choose (Firestore,Cloud Function, and Local emulator suite).
-
+- Clone this repository on your machine
+- Copy everything in the folder "legui-legui-api" and past the files and folders on the root of your project directory.(when same files are found on your directory, confirm the replacement) 
 ## Usage
 
 ```python
