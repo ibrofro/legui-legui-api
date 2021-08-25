@@ -42,14 +42,40 @@ JSON {
       "receiverPayer":boolean
 }
 
-# returns 'words'
-foobar.pluralize('word')
+...api/getprice ::POST
+JSON {
+     
+      "receiverPhone:string,
+      "receiverUid":string,
+      "receiverName":string,
+      "senderPhone:string,
+      "deliveryId":string,
+      "receiverNotificationToken":string,
+      "senderLatitude": string,
+      "senderLongitude": string,
+      "receiverLatitude": string,
+      "receiverLongitude": string,
+      "senderPayer":boolean,
+      "receiverPayer":boolean
+}
 
-# returns 'geese'
-foobar.pluralize('goose')
+...api/finish-delivery-setup ::POST
+JSON {
+     
+      "receiverPhone:string,
+      "receiverUid":string,
+      "receiverName":string,
+      "senderPhone:string,
+      "deliveryId":string,
+      "receiverNotificationToken":string,
+      "senderLatitude": string,
+      "senderLongitude": string,
+      "receiverLatitude": string,
+      "receiverLongitude": string,
+      "senderPayer":boolean,
+      "receiverPayer":boolean
+}
 
-# returns 'phenomenon'
-foobar.singularize('phenomena')
 ```
 
 ## Contributing
