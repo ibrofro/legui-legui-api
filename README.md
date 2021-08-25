@@ -24,7 +24,7 @@ npm install
 ```bash
 MAPBOX_TOKEN=token
 ```
-- Create a credential.json file into "./functions" folder and make sure to copy your credentials from firebase to credential.json file  
+- Create a credential.json file into "./functions" folder and make sure to copy your service account info to from firebase to credential.json file  
 ```bash
 {
     "type": "",
@@ -81,8 +81,7 @@ JSON {
 }
 
 ...api/finish-delivery-setup ::POST
-JSON {
-     
+JSON { 
       "receiverPhone:string,
       "receiverUid":string,
       "receiverName":string,
