@@ -20,6 +20,27 @@ firebase login
 ```bash
 npm install
 ```
+- Create a .env file into "./functions" folder and make sure to have a Mapbox token for the geolocation feature to work (you can create your own Mapbox token they have a free plan" 
+```bash
+MAPBOX_TOKEN=token
+```
+- Create a credential.json file into "./functions" folder and make sure to copy your credentials from firebase to credential.json file  
+```bash
+{
+    "type": "",
+    "project_id": "",
+    "private_key_id": "",
+    "private_key": "-----BEGIN PRIVATE KEY-----\\n-----END PRIVATE KEY-----\n",
+    "client_email": "",
+    "client_id": "",
+    "auth_uri": "",
+    "token_uri": "",
+    "auth_provider_x509_cert_url": "",
+    "client_x509_cert_url": ""
+  }
+  
+```
+
 - Navigate to your project root folder and run the command  
 ```bash
 firebase emulators:start --only "functions,firestore" --import "./firestore_data";
